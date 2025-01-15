@@ -1,43 +1,70 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, ImgHTMLAttributes, FC } from 'react'
 
-import { API_BASE_URL } from '../constants'
-import { useMedia } from '../hooks'
-import { classNames } from '../helpers'
+import { classNames, thumbHashToDataURL } from '../helpers'
 
 import styles from './LazyImage.module.css'
 
+const base64ToBinary = (b64: string) => new Uint8Array(window.atob(b64).split('').map(x => x.charCodeAt(0)))
+
 interface Props {
-  src: string
-  alt?: string
+  thumbhash: string
 }
 
-const proxifyImageURL = (url: string, width: number) =>
-  `${API_BASE_URL}/img?url=${encodeURIComponent(url)}&width=${width}`
+const hideFn = (ev: React.SyntheticEvent<HTMLElement, Event>) => {ev.currentTarget.style.display = 'none'}
 
-export const LazyImage = ({ src, alt = '' }: Props) => {
-  const mobileDisplay = useMedia('(max-width: 767px)')
+export const LazyImage: FC<ImgHTMLAttributes<HTMLImageElement> & Props> = ({thumbhash, srcSet, ...attrs }) => {
   const [loaded, setLoaded] = useState(false)
+  const [data, setData] = useState('')
+  const [width, setWidth] = useState('0px')
+  const [aspectRatio, setAspectRatio] = useState<number>()
   const imgRef = useRef<HTMLImageElement>(null)
+  const lqipRef = useRef<HTMLImageElement>(null)
   useEffect(() => {
     if (imgRef.current && imgRef.current.complete) {
       setLoaded(true)
     }
   }, [])
 
+  useEffect(() => {
+    if (!thumbhash) {
+      return
+    }
+    const [size, hash] = thumbhash.split('|')
+    const [width, height] = size.split('x')
+    setWidth(`${width}px`)
+    try {
+      if (height) {
+        setAspectRatio(parseInt(width) / parseInt(height))
+      }
+      setData(thumbHashToDataURL(base64ToBinary(hash)))
+    } catch (err) {
+      console.error('unable to decode thumbhash', err)
+    }
+  }, [thumbhash])
+
+  if (!thumbhash) {
+    return <img {...attrs} onError={hideFn} />
+  }
+
   return (
     <div className={styles.wrapper}>
-      <img src={proxifyImageURL(src, 64)} aria-hidden="true" alt={alt} className={styles.lqip} />
+      <img {...attrs}
+        ref={lqipRef}
+        width={width}
+        src={data}
+        aria-hidden="true"
+        onAnimationEnd={hideFn}
+        style={{ aspectRatio }}
+        className={classNames(styles.lqip, loaded ? styles.loaded : null)}
+      />
       <img
         ref={imgRef}
-        src={src}
-        srcSet={`${proxifyImageURL(src, 320)} 320w,
-                ${proxifyImageURL(src, 767)} 767w`}
-        sizes={mobileDisplay ? '100vw' : '320px'}
-        alt={alt}
+        {...attrs}
+        srcSet={srcSet}
         loading="lazy"
         className={classNames(styles.source, loaded ? styles.loaded : null)}
         onLoad={() => setLoaded(true)}
-        onError={(e) => (e.currentTarget.style.display = 'none')}
+        onError={hideFn}
       />
     </div>
   )

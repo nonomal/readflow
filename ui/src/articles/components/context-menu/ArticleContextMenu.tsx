@@ -16,11 +16,11 @@ interface Props {
 
 export const ArticleContextMenu = (props: Props) => {
   const nvg: any = window.navigator
-  const title = 'More actions...'
+  const title = 'More actions ...'
   const isOnline = !props.article.isOffline
   
   return (
-    <DrawerMenu title={title}>
+    <DrawerMenu title={title} kbs={props.keyboard ? 'm' : ''}>
       <ul>
         {props.showEditModal && (
           <li>

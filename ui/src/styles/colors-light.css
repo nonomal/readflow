@@ -2,6 +2,7 @@
   --error-color: #cd5356;
   --warning-color: #ff922f;
   --main-bg-color: #eaeff1;
+  --main-text-color: #000;
   --navbar-bg-color: #18202c;
   --navbar-header-text-color: white;
   --navbar-header-bg-color: #232f3e;
@@ -35,4 +36,5 @@
   --table-separator: #ffffff0f;
   --input-text-color: #333;
   --input-bg-color: #f5f5f5;
+  --link-color: #009be5;
 }

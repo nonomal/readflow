@@ -136,7 +136,7 @@ export default (props: AllProps) => {
   }, [data, fetchMore, req])
 
   const refresh = useCallback(async () => {
-    console.log('re-fetching articles...')
+    console.log('re-fetching articles ...')
     const { errors } = await refetch()
     if (errors) {
       console.error(errors)
@@ -199,7 +199,7 @@ export default (props: AllProps) => {
 
   return (
     <Page title={title} header={$header} scrollToTop>
-      {refetching && <Loader center />}
+      {refetching && <Loader style={{position: 'fixed', right: '2em', top: '3em'}} />}
       {render(loading, data, error)}
     </Page>
   )

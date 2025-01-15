@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { API_BASE_URL } from '../../../constants'
 import { IncomingWebhook } from './models'
 import Bookmarklet from './Bookmarklet'
-import { HelpLink, Logo, Masked } from '../../../components'
+import { HelpLink, Logo, CopyableField } from '../../../components'
 import HelpSection from '../../HelpSection'
 import QRCodeIncomingWebhookButton from './QRCodeIncomingWebhookButton'
+import { getAPIURL } from '../../../helpers'
 
 interface Props {
   data?: IncomingWebhook
@@ -17,18 +17,26 @@ export default ({ data }: Props) => (
     <span>
       Use incoming webhooks to post articles to your Readflow.<br />
       Messages are sent via an HTTP POST request to Readflow integration URL.<br />
-      You can customise your integration with a script.
+      You can customize your integration with a script.
       {data && (
         <table>
           <tbody>
             <tr>
               <th>Ingestion URL</th>
-              <td>{API_BASE_URL + '/articles'}</td>
+              <td>{getAPIURL('/articles')}</td>
             </tr>
+            {data.email &&
+              <tr>
+                <th>Ingestion email</th>
+                <td>
+                  <CopyableField value={data.email} />
+                </td>
+              </tr>
+            }
             <tr>
               <th>Token</th>
               <td>
-                <Masked value={data.token} />
+                <CopyableField masked value={data.token} />
               </td>
             </tr>
             <tr>

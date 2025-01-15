@@ -77,23 +77,25 @@
 }
 
 .illustration {
-  border-top-left-radius: inherit;
-  border-top-right-radius: inherit;
   flex-direction: column;
+  display: flex;
+  background: hsl(0deg 0% 97%);
+  height: fit-content;
 }
 
-.illustration > img {
+.illustration img {
   align-self: center;
-  border-radius: inherit;
-  max-width: 100%;
+  max-width: 320px;
+  mix-blend-mode: darken;
 }
 
-@media (min-width: 767px) {
+@media (max-width: 767px) {
   .illustration {
-    display: flex; 
-    border-top-right-radius: initial;
+    margin: 1em 1em 0;
+    border-radius: 1em;
+    overflow: clip;
   }
-  .illustration > img {
-    max-width: 320px;
+  .illustration img {
+    max-width: 100%;
   }
 }

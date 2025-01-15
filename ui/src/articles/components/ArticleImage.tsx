@@ -1,20 +1,46 @@
-import React, { FC, ImgHTMLAttributes } from 'react'
+import React, { FC, ImgHTMLAttributes, useEffect, useState } from 'react'
 
-import { API_BASE_URL } from '../../constants'
+import { Article, ArticleThumbnail } from '../models'
+import { getAPIURL } from '../../helpers'
+import { LazyImage } from '../../components'
 
-const proxifyImageURL = (url: string, width: number) =>
-  `${API_BASE_URL}/img?url=${encodeURIComponent(url)}&width=${width}`
+const getThumbnailURL = (thumbnail: ArticleThumbnail, src: string) => `${getAPIURL()}/img/${thumbnail.hash}/resize:fit:${thumbnail.size}/${btoa(src)}`
 
-export const ArticleImage: FC<ImgHTMLAttributes<HTMLImageElement>> = ({ src, ...attrs }) => {
-  if (src && src.match(/^https?:\/\//)) {
-    attrs.srcSet = `${proxifyImageURL(src, 320)} 320w, ${proxifyImageURL(src, 767)} 767w`
+const getThumbnailAttributes = (article: Article) => {
+  const attrs :ImgHTMLAttributes<HTMLImageElement> = {}
+  if (!article.thumbnails || article.thumbnails.length == 0) {
+    return attrs
   }
+
+  const thumbnails = [...article.thumbnails].sort((a, b) => parseInt(b.size) - parseInt(a.size))
+  const sizes = thumbnails.map(thumb => `${thumb.size}px`)
+  attrs.sizes = `(max-width: ${sizes[0]}) ${sizes.join(', ')}`
+  attrs.srcSet = thumbnails.reverse().map(thumb => `${getThumbnailURL(thumb, article.image)} ${thumb.size}w`).join(',')
+  return attrs
+}
+
+interface Props {
+  article: Article
+}
+
+export const ArticleImage: FC<Props> = ({ article }) => {
+  const [attrs, setAttrs] = useState<ImgHTMLAttributes<HTMLImageElement>>({})
+  useEffect(() => {
+    if (article.image && article.image.match(/^https?:\/\//)) {
+      try {
+        setAttrs(getThumbnailAttributes(article))
+      } catch (err) {
+        console.error('unable to get article thumbnail attributes', article, err)
+      }
+    }
+  }, [article])
+  
   return (
-    <img
+    <LazyImage
       {...attrs}
-      sizes="(max-width: 767px) 767px, 320px"
-      src={src}
-      onError={(e) => (e.currentTarget.style.display = 'none')}
+      thumbhash={article.thumbhash}
+      src={article.image}
+      // crossOrigin='anonymous'
     />
   )
 }

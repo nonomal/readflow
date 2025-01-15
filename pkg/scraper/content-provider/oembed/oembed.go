@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 
-	"github.com/ncarlier/readflow/pkg/constant"
+	"github.com/ncarlier/readflow/pkg/defaults"
 	"github.com/ncarlier/readflow/pkg/scraper"
 )
 
@@ -35,11 +35,11 @@ type oEmbedContentProvider struct {
 func (cp oEmbedContentProvider) Get(ctx context.Context, rawurl string) (*scraper.WebPage, error) {
 	oembedURL := cp.endpoint + queryParams + rawurl
 
-	req, err := http.NewRequest("GET", oembedURL, nil)
+	req, err := http.NewRequest("GET", oembedURL, http.NoBody)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", constant.UserAgent)
+	req.Header.Set("User-Agent", defaults.UserAgent)
 	req = req.WithContext(ctx)
 	res, err := cp.httpClient.Do(req)
 	if err != nil || res.StatusCode >= 300 {
@@ -52,7 +52,7 @@ func (cp oEmbedContentProvider) Get(ctx context.Context, rawurl string) (*scrape
 		defer res.Body.Close()
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +78,6 @@ func (cp oEmbedContentProvider) Match(rawurl string) bool {
 }
 
 func init() {
-	httpClient := &http.Client{
-		Timeout: constant.DefaultTimeout,
-	}
-
 	for _, provider := range Providers {
 		for _, endpoint := range provider.Endpoints {
 			for _, scheme := range endpoint.Schemes {
@@ -93,7 +89,7 @@ func init() {
 					name:       provider.Name,
 					endpoint:   strings.ReplaceAll(endpoint.URL, "{format}", "json"),
 					re:         re,
-					httpClient: httpClient,
+					httpClient: http.DefaultClient,
 				})
 			}
 		}

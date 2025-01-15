@@ -6,6 +6,8 @@ export interface Article {
   html: string
   text: string
   image: string
+  thumbhash: string
+  thumbnails?: ArticleThumbnail[]
   url: string
   status: ArticleStatus
   stars: number
@@ -14,6 +16,11 @@ export interface Article {
   published_at: string
   created_at: string
   updated_at: string
+}
+
+export interface ArticleThumbnail {
+  size: string
+  hash: string
 }
 
 export type ArticleStatus = 'inbox' | 'read' | 'to_read'
@@ -51,6 +58,7 @@ export interface UpdateArticleRequest {
   status?: ArticleStatus
   stars?: number
   category_id?: number
+  refresh?: boolean
 }
 
 export interface UpdateArticleResponse {
@@ -59,6 +67,14 @@ export interface UpdateArticleResponse {
     _inbox: number
     _to_read: number
     _starred: number
+  }
+}
+
+export interface SendArticleToOutgoingWebhookResponse {
+  sendArticleToOutgoingWebhook: {
+    url?: string
+    text?: string
+    json?: string
   }
 }
 

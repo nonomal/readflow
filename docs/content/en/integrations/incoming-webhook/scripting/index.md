@@ -13,8 +13,11 @@ This script gives control over a set of features:
 - Change the title of the article (`setTitle(string)`)
 - Change the text of the article (`setText(string)`)
 - Categorize the article (`setCategory(string)`)
+- Mark article as read (`markAsRead()`)
+- Mark article as to-read (`markAsToRead()`)
 - Notify connected devices of the article (`sendNotification()`)
 - Call an outgoing webhook (`triggerWebhook(string)`)
+- Disable the global notification policy for this webhook (`disableGlobalNotification()`)
 
 The script expects a boolean value in return.
 This value decides the fate of the article:
@@ -35,7 +38,12 @@ You can access the following attributes within your script:
 - `HTML`: the HTML content of the article
 - `URL`: the URL of the article
 - `Origin`: the article origin
-- `Tags`: the tags of the article (string array)
+- `Tags`: the *tags* **and** *hashtags* of the article (string array)
+
+> Note that *hashtags* are extracted from the article title and text, while *tags* come with the input article.
+> Only hashtags are kept (because they are part of the title and text).
+> Input tags are not kept and are only used by the script.
+> If you want to keep the tags, it's recommended to include them as hashtags in the title or text.
 
 ## Examples
 

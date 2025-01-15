@@ -1,14 +1,14 @@
 import React, { FC, PropsWithChildren, useCallback, useMemo } from 'react'
 import { ApolloClient, ApolloProvider, from, HttpLink, InMemoryCache, ServerError } from '@apollo/client'
 
-import { API_BASE_URL } from '../constants'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import { useAuth } from '../auth/AuthProvider'
+import { getAPIURL } from '../helpers'
 
 // HTTP client
 const httpLink = new HttpLink({
-  uri: API_BASE_URL + '/graphql',
+  uri: getAPIURL('/graphql'),
 })
 
 const cache = new InMemoryCache()
@@ -41,8 +41,8 @@ const GraphQLProvider: FC<PropsWithChildren> = ({ children }) => {
           message === 'login_required' ||
           message === 'invalid_grant'
         ) {
-          console.warn('redirecting to login page...')
-          login()
+          console.warn(`${message}: redirecting to login page ...`)
+          login && login()
         }
       }
     })

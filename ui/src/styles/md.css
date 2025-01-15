@@ -112,11 +112,15 @@ fieldset {
   -webkit-transition: all 0.28s ease;
   transition: all 0.28s ease;
 }
-.form-group .control-label-alt {
+.form-group .control-label.alt {
+  position: relative;
   font-size: 0.8rem;
   color: gray;
   margin-bottom: 0.8em;
   display: block;
+}
+.form-group .control-label i {
+  font-size: inherit;
 }
 .form-group .bar {
   position: relative;
@@ -168,6 +172,7 @@ fieldset {
   color: var(--input-text-color);
 }
 .form-group select ~ .control-label,
+.form-group button ~ .control-label,
 .form-group input:focus ~ .control-label,
 .form-group input:valid ~ .control-label,
 .form-group input.form-file ~ .control-label,

@@ -13,8 +13,11 @@ Ce script donne la main sur un ensemble de fonctionnalités:
 - Changer le titre de l'article (`setTitle(string)`)
 - Changer le texte de l'article (`setText(string)`)
 - Catégoriser l'article (`setCategory(string)`)
+- Marquer l'article comme lu (`markAsRead()`)
+- Marquer l'article comme à lire (`markAsToRead()`)
 - Notifier l'article aux appareils connectés (`sendNotification()`)
 - Appeler un webhook sortant (`triggerWebhook(string)`)
+- Désactiver la politique de notification globale pour ce webhook (`disableGlobalNotification()`)
 
 Le script attend en retour une valeur booléenne.
 Cette valeur décide du sort de l'article:
@@ -35,7 +38,12 @@ Vous pouvez accéder au sein de votre script aux attributs suivants:
 - `HTML`: le contenu HTML de l'article
 - `URL`: l'URL de l'article
 - `Origin`: l'origine de l'article
-- `Tags`: les tags de l'article (tableau de string)
+- `Tags`: les *tags* **et** *hashtags* de l'article (tableau de string)
+
+> Notez que les *hashtags* sont extraits du titre et du texte de l'article, tandis que les *tags* sont fournis avec l'article en entrée.
+> Seuls les hashtags sont conservés (car ils font partie du titre et du texte).
+> Les tags d'entrée ne sont pas conservées et ne sont utilisées que par le script.
+> Si vous souhaitez conserver les tags, il est recommandé de les inclure en tant que hashtags dans le titre ou le texte.
 
 ## Exemples
 

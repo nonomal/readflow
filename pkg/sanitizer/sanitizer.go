@@ -6,8 +6,9 @@ import (
 
 	"github.com/go-shiori/dom"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/ncarlier/readflow/pkg/logger"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/tdewolff/minify/v2"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -17,15 +18,17 @@ type Sanitizer struct {
 	logger    zerolog.Logger
 	blockList *BlockList
 	policy    *bluemonday.Policy
+	minifier  *minify.M
 }
 
 // NewSanitizer create new HTML sanitizer
 func NewSanitizer(blockList *BlockList) *Sanitizer {
-	logger := log.With().Str("component", "sanitizer").Logger()
+	logger := logger.With().Str("component", "sanitizer").Logger()
 	policy := bluemonday.UGCPolicy()
 	policy.AddTargetBlankToFullyQualifiedLinks(true)
 	policy.AllowAttrs("width", "height", "src", "allowfullscreen", "sandbox").OnElements("iframe")
-	policy.AllowAttrs("srcset", "sizes", "data-src").OnElements("img")
+	policy.AllowAttrs("srcset", "sizes").OnElements("img", "source")
+	policy.AllowElements("picture", "source")
 
 	if blockList != nil {
 		logger.Info().
@@ -38,6 +41,7 @@ func NewSanitizer(blockList *BlockList) *Sanitizer {
 		logger:    logger,
 		blockList: blockList,
 		policy:    policy,
+		minifier:  newDefaultMinifier(),
 	}
 }
 
@@ -90,6 +94,11 @@ func (s *Sanitizer) Sanitize(content string) string {
 			s.cleanURLs(doc)
 			content = dom.InnerHTML(doc)
 		}
+	}
+
+	min, err := s.minifier.String("text/html", content)
+	if err == nil {
+		content = min
 	}
 
 	return s.policy.Sanitize(content)

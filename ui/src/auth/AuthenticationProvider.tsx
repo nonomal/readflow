@@ -2,12 +2,12 @@ import React, { FC, PropsWithChildren } from 'react'
 import { AuthProvider } from './AuthProvider'
 
 import { AuthenticatedPage } from './AuthenticatedPage'
-import { AUTHORITY } from '../constants'
+import { AUTHORITY } from '../config'
 import { useOnlineStatus } from '../hooks'
 
 const AuthenticationProvider: FC<PropsWithChildren> = ({ children }) => {
   const offline = !useOnlineStatus()
-  const disabled = AUTHORITY === 'mock'
+  const disabled = AUTHORITY === 'none'
   if (disabled || offline) {
     return <>{children}</>
   }

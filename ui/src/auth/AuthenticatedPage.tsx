@@ -1,24 +1,18 @@
-import React, { FC, PropsWithChildren, useEffect } from 'react'
+import React, { FC, PropsWithChildren } from 'react'
 
 import { useAuth } from './AuthProvider'
 import { Center, ErrorPage, Loader } from '../components'
 
-export const AuthenticatedPage: FC<PropsWithChildren> = ({ children }) => {
-  const { isLoading, isAuthenticated, error, login } = useAuth()
+//const isLoginError = (err: any) => err && err.error && err.error === 'invalid_grant'
 
-  useEffect(() => {
-    //console.debug({ isLoading, isAuthenticated, error })
-    if (!isLoading && !error && !isAuthenticated) {
-      console.info('user not authenticated, redirecting to sign-in page...')
-      login()
-    }
-  }, [isLoading, isAuthenticated, error, login])
+export const AuthenticatedPage: FC<PropsWithChildren> = ({ children }) => {
+  const { isLoading, user, error } = useAuth()
 
   if (error) {
     return <ErrorPage title="Unable to authenticate user">{error?.message}</ErrorPage>
   }
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || !user) {
     return (
       <Center>
         <Loader />
